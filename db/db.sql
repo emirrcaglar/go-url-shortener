@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS url;
+CREATE TABLE url (
+    id INT AUTO_INCREMENT NOT NULL,
+    long_url varchar(255) NOT NULL,
+    PRIMARY KEY (id)
+) AUTO_INCREMENT = 1000000 ;
+
