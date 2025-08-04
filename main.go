@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 
+	"github.com/emirrcaglar/go-url-shortener/db"
 	"github.com/emirrcaglar/go-url-shortener/utils"
 )
 
@@ -13,6 +15,12 @@ func isValidUrl(inputUrl string) bool {
 }
 
 func main() {
+	db, err := db.Connect()
+	if err != nil {
+		log.Println("error connecting to db")
+		return
+	}
+
 	for {
 		var inputUrl string
 
@@ -21,7 +29,7 @@ func main() {
 		fmt.Scan(&inputUrl)
 		if inputUrl == "q" {
 			fmt.Println("goodbye.")
-			break
+			return
 		}
 
 		if !isValidUrl(inputUrl) {
@@ -32,7 +40,7 @@ func main() {
 		url := &utils.Url{}
 		baseUrl := "short.ly/"
 
-		shortUrl := utils.GenerateShortUrl(url, inputUrl, baseUrl)
+		shortUrl := utils.GenerateShortUrl(db, url, inputUrl, baseUrl)
 
 		fmt.Printf("Your short url is: %s\n", shortUrl)
 	}

@@ -1,13 +1,11 @@
 package utils
 
 import (
+	"database/sql"
 	"log"
-
-	"github.com/emirrcaglar/go-url-shortener/db"
 )
 
-func saveToDb(u *Url, url string) (err error) {
-	db, err := db.Connect()
+func saveToDb(db *sql.DB, u *Url, url string) (err error) {
 	if err != nil {
 		log.Printf("Error connecting to data at saveToDB.")
 		return err

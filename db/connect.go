@@ -37,6 +37,7 @@ func Connect() (*sql.DB, error) {
 		log.Println(pingErr)
 	}
 
+	log.Println("Successfully connected to db.")
 	return db, nil
 }
 
