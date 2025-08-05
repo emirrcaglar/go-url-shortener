@@ -1,10 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/url"
 
+	"github.com/emirrcaglar/go-url-shortener/auth"
 	"github.com/emirrcaglar/go-url-shortener/db"
 	"github.com/emirrcaglar/go-url-shortener/utils"
 )
@@ -21,27 +23,94 @@ func main() {
 		return
 	}
 
+	var loggedIn bool
 	for {
 		var inputUrl string
+		var input string
 
-		fmt.Println("Enter the url you want to shorten.")
+		fmt.Printf("DEBUG - LOGGED IN: %v\n", loggedIn)
 
-		fmt.Scan(&inputUrl)
-		if inputUrl == "q" {
-			fmt.Println("goodbye.")
-			return
+		if loggedIn {
+			fmt.Println("1 - URL Shortener")
+			fmt.Println("4 - Logout")
+			fmt.Println("q - Exit")
+			fmt.Scan(&input)
+
+			if input == "q" {
+				fmt.Println("goodbye.")
+				return
+			}
+
+			if input == "1" {
+				fmt.Println("enter the url you want to shorten")
+				fmt.Scan(&inputUrl)
+				shorten(db, inputUrl)
+				continue
+			}
+
+			if input == "4" {
+				loggedIn = false
+				fmt.Println("Logged out.")
+				continue
+			}
 		}
 
-		if !isValidUrl(inputUrl) {
-			fmt.Printf("Please enter a valid url.\n")
-			continue
+		if !loggedIn {
+			fmt.Println("2 - Login")
+			fmt.Println("3 - Register")
+			fmt.Println("q - Exit")
+			fmt.Scan(&input)
+
+			if input == "q" {
+				fmt.Println("goodbye.")
+				return
+			}
+
+			if input == "2" || input == "3" {
+				var userName string
+				var password string
+				fmt.Println("Enter username")
+				fmt.Scan(&userName)
+				fmt.Println("Enter password")
+				fmt.Scan(&password)
+
+				if input == "2" {
+					err := auth.Login(db, userName, password)
+					if err != nil {
+						log.Printf("error logging in: %v", err)
+						continue
+					}
+					loggedIn = true
+					fmt.Println("Successfully logged in.")
+					fmt.Println("Welcome, ", userName)
+					continue
+				}
+
+				if input == "3" {
+					err := auth.Register(db, userName, password)
+					if err != nil {
+						log.Printf("error registering: %v", err)
+						continue
+					}
+					fmt.Println("Successfully registered.")
+					continue
+				}
+			}
 		}
-
-		url := &utils.Url{}
-		baseUrl := "short.ly/"
-
-		shortUrl := utils.GenerateShortUrl(db, url, inputUrl, baseUrl)
-
-		fmt.Printf("Your short url is: %s\n", shortUrl)
 	}
+}
+
+func shorten(db *sql.DB, input string) {
+
+	if !isValidUrl(input) {
+		fmt.Printf("Please enter a valid url.\n")
+		return
+	}
+
+	url := &utils.Url{}
+	baseUrl := "short.ly/"
+
+	shortUrl := utils.GenerateShortUrl(db, url, input, baseUrl)
+
+	fmt.Printf("Your short url is: %s\n", shortUrl)
 }

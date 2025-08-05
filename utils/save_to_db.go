@@ -14,7 +14,7 @@ func saveToDb(db *sql.DB, u *Url, url string) (err error) {
 	defer db.Close()
 
 	res, err := db.Exec(
-		"INSERT INTO url (long_url) VALUES (?)", url)
+		"INSERT INTO urls (long_url) VALUES (?)", url)
 	if err != nil {
 		log.Printf("Error inserting into table. %v\n", err)
 		return err
