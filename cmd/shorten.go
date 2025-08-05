@@ -48,8 +48,6 @@ var shortenCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("DEBUG - SHORTURL: %s\n", shortURL)
-
 		fmt.Printf("✅ Short URL: %s\n", shortURL)
 	},
 }

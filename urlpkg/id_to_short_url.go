@@ -1,9 +1,6 @@
 package urlpkg
 
-import "fmt"
-
 func idToShortUrl(baseUrl string, urlid int) string {
-	fmt.Printf("DEBUG - IDTOSHORTURL id: %d\n", urlid)
 	chars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 	if urlid == 0 {
@@ -24,6 +21,5 @@ func idToShortUrl(baseUrl string, urlid int) string {
 
 	finalResult := baseUrl + string(result)
 
-	fmt.Printf("DEBUG - IDTOSHORTURL finalResult: %s\n", finalResult)
 	return finalResult
 }
