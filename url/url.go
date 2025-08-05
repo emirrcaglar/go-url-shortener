@@ -1,4 +1,4 @@
-package utils
+package url
 
 import (
 	"database/sql"
@@ -10,7 +10,7 @@ type Url struct {
 	LONG_URL string `json:"long_url"`
 }
 
-func GenerateShortUrl(db *sql.DB, u *Url, url string, baseUrl string) (shortUrl string) {
+func (*Url) GenerateShortUrl(db *sql.DB, u *Url, url string, baseUrl string) (shortUrl string) {
 	err := saveToDb(db, u, url)
 
 	if err != nil {

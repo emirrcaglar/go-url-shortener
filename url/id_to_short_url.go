@@ -1,4 +1,4 @@
-package utils
+package url
 
 func (u *Url) idToShortUrl(baseUrl string) string {
 	chars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

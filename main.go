@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net/url"
+	_url "net/url"
 
 	"github.com/emirrcaglar/go-url-shortener/auth"
 	"github.com/emirrcaglar/go-url-shortener/db"
@@ -12,7 +12,7 @@ import (
 )
 
 func isValidUrl(inputUrl string) bool {
-	_, err := url.ParseRequestURI(inputUrl)
+	_, err := _url.ParseRequestURI(inputUrl)
 	return err == nil
 }
 
@@ -22,6 +22,7 @@ func main() {
 		log.Println("error connecting to db")
 		return
 	}
+	defer db.Close()
 
 	var loggedIn bool
 	for {

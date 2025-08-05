@@ -1,4 +1,4 @@
-package utils
+package url
 
 import (
 	"database/sql"
@@ -6,13 +6,6 @@ import (
 )
 
 func saveToDb(db *sql.DB, u *Url, url string) (err error) {
-	if err != nil {
-		log.Printf("Error connecting to data at saveToDB.")
-		return err
-	}
-
-	defer db.Close()
-
 	res, err := db.Exec(
 		"INSERT INTO urls (long_url) VALUES (?)", url)
 	if err != nil {
