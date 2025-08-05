@@ -11,13 +11,21 @@ type Url struct {
 }
 
 func (*Url) GenerateShortUrl(db *sql.DB, u *Url, long_url, baseUrl string, userID int) (string, error) {
+
+	short_url, err := u.checkExistingUrl(db, long_url, userID)
+	if err != nil {
+		return "", err
+	}
+	if short_url != "" {
+		return short_url, nil
+	}
+
 	tx, err := db.Begin()
 	if err != nil {
 		return "", err
 	}
 
 	defer tx.Rollback()
-
 	res, err := tx.Exec("INSERT INTO urls (long_url, short_url, userID) VALUES (?, ?, ?)", long_url, "", userID)
 	if err != nil {
 		return "", err
@@ -29,7 +37,7 @@ func (*Url) GenerateShortUrl(db *sql.DB, u *Url, long_url, baseUrl string, userI
 	}
 
 	u.ID = int(lid)
-	short_url := idToShortUrl(baseUrl, u.ID)
+	short_url = idToShortUrl(baseUrl, u.ID)
 	u.LONG_URL = long_url
 	u.SHORT_URL = short_url
 
@@ -44,4 +52,21 @@ func (*Url) GenerateShortUrl(db *sql.DB, u *Url, long_url, baseUrl string, userI
 
 	// return short_url to print it
 	return short_url, nil
+}
+
+func (*Url) checkExistingUrl(db *sql.DB, long_url string, userID int) (string, error) {
+	row := db.QueryRow("SELECT long_url, short_url, userID FROM urls WHERE long_url = ? AND userID = ?", long_url, userID)
+	var (
+		dblongUrl, shortCode string
+		dbUserID             int
+	)
+	err := row.Scan(&dblongUrl, &shortCode, &dbUserID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", nil
+		}
+		return "", err
+	}
+
+	return shortCode, nil
 }
