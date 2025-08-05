@@ -3,11 +3,11 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/emirrcaglar/go-url-shortener/auth"
 	"github.com/emirrcaglar/go-url-shortener/db"
 	"github.com/emirrcaglar/go-url-shortener/session"
-	"github.com/emirrcaglar/go-url-shortener/types"
 	"github.com/emirrcaglar/go-url-shortener/utils"
 	"github.com/spf13/cobra"
 )
@@ -43,13 +43,7 @@ var loginCmd = &cobra.Command{
 		}
 
 		// Save session
-		cfg = &session.Cfg{
-			LoggedIn: true,
-			CurrentUser: &types.User{
-				ID:       user.ID,
-				UserName: user.UserName,
-			},
-		}
+		cfg = session.NewSession(user, 24*time.Hour)
 		err = session.SaveConfig(cfg)
 		if err != nil {
 			fmt.Printf("❌ Could not save session: %v\n", err)

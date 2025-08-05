@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/emirrcaglar/go-url-shortener/types"
 )
@@ -11,6 +12,8 @@ import (
 type Cfg struct {
 	LoggedIn    bool        `json:"loggedIn"`
 	CurrentUser *types.User `json:"currentUser"`
+	CreatedAt   time.Time   `json:"createdAt"`
+	Expiration  time.Time   `json:"expiration"`
 }
 
 var ConfigFile string
@@ -18,6 +21,16 @@ var ConfigFile string
 func init() {
 	home, _ := os.UserHomeDir()
 	ConfigFile = filepath.Join(home, ".urlshortener", "config.json")
+}
+
+func NewSession(user *types.User, ttl time.Duration) *Cfg {
+	now := time.Now()
+	return &Cfg{
+		LoggedIn:    true,
+		CurrentUser: user,
+		CreatedAt:   now,
+		Expiration:  now.Add(ttl),
+	}
 }
 
 func LoadConfig() (*Cfg, error) {
@@ -30,7 +43,20 @@ func LoadConfig() (*Cfg, error) {
 		return nil, err
 	}
 	err = json.Unmarshal(data, cfg)
-	return cfg, err
+	if err != nil {
+		return nil, err
+	}
+
+	if cfg.HasExpired() {
+		cfg.LoggedIn = false
+		cfg.CurrentUser = nil
+	}
+
+	return cfg, nil
+}
+
+func (c *Cfg) HasExpired() bool {
+	return c.LoggedIn && time.Now().After(c.Expiration)
 }
 
 func SaveConfig(cfg *Cfg) error {
