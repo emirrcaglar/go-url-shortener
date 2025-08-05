@@ -3,20 +3,27 @@ package auth
 import (
 	"database/sql"
 	"fmt"
+
+	"github.com/emirrcaglar/go-url-shortener/types"
 )
 
-func Login(db *sql.DB, username, password string) error {
+func Login(db *sql.DB, username, password string) (*types.User, error) {
 	var userPasswordHash string
-	err := db.QueryRow("SELECT userpass FROM users WHERE username = (?)", username).Scan(&userPasswordHash)
+	var id int
+
+	err := db.QueryRow("SELECT id, userpass FROM users WHERE username = (?)", username).Scan(&id, &userPasswordHash)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return fmt.Errorf("invalid username or password")
+			return nil, fmt.Errorf("invalid username or password")
 		}
-		return err
+		return nil, err
 	}
 	err = checkPasswordHash(userPasswordHash, password)
 	if err != nil {
-		return fmt.Errorf("invalid username or password")
+		return nil, fmt.Errorf("invalid username or password")
 	}
-	return nil
+	return &types.User{
+		ID:       id,
+		UserName: username,
+	}, nil
 }

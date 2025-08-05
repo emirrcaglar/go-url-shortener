@@ -5,9 +5,9 @@ import (
 	"log"
 )
 
-func saveToDb(db *sql.DB, u *Url, url string) (err error) {
+func saveToDb(db *sql.DB, u *Url, url string, userId int) (err error) {
 	res, err := db.Exec(
-		"INSERT INTO urls (long_url) VALUES (?)", url)
+		"INSERT INTO urls (long_url, userID) VALUES (?, ?)", url, userId)
 	if err != nil {
 		log.Printf("Error inserting into table. %v\n", err)
 		return err

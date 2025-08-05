@@ -8,6 +8,7 @@ import (
 
 	"github.com/emirrcaglar/go-url-shortener/auth"
 	"github.com/emirrcaglar/go-url-shortener/db"
+	"github.com/emirrcaglar/go-url-shortener/types"
 	"github.com/emirrcaglar/go-url-shortener/url"
 )
 
@@ -25,6 +26,8 @@ func main() {
 	defer db.Close()
 
 	var loggedIn bool
+	var currentUser *types.User
+
 	for {
 		var inputUrl string
 		var input string
@@ -45,12 +48,13 @@ func main() {
 			if input == "1" {
 				fmt.Println("enter the url you want to shorten")
 				fmt.Scan(&inputUrl)
-				shorten(db, inputUrl)
+				shorten(db, inputUrl, currentUser.ID)
 				continue
 			}
 
 			if input == "4" {
 				loggedIn = false
+				currentUser = nil
 				fmt.Println("Logged out.")
 				continue
 			}
@@ -76,14 +80,17 @@ func main() {
 				fmt.Scan(&password)
 
 				if input == "2" {
-					err := auth.Login(db, userName, password)
+					u, err := auth.Login(db, userName, password)
 					if err != nil {
 						log.Printf("error logging in: %v", err)
 						continue
 					}
+
+					currentUser = u
 					loggedIn = true
+
 					fmt.Println("Successfully logged in.")
-					fmt.Println("Welcome, ", userName)
+					fmt.Println("Welcome, ", u.UserName)
 					continue
 				}
 
@@ -101,7 +108,7 @@ func main() {
 	}
 }
 
-func shorten(db *sql.DB, input string) {
+func shorten(db *sql.DB, input string, userId int) {
 
 	if !isValidUrl(input) {
 		fmt.Printf("Please enter a valid url.\n")
@@ -111,7 +118,7 @@ func shorten(db *sql.DB, input string) {
 	url := &url.Url{}
 	baseUrl := "short.ly/"
 
-	shortUrl := url.GenerateShortUrl(db, url, input, baseUrl)
+	shortUrl := url.GenerateShortUrl(db, url, input, baseUrl, userId)
 
 	fmt.Printf("Your short url is: %s\n", shortUrl)
 }
