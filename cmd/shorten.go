@@ -23,6 +23,7 @@ var shortenCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg, err := utils.CheckStatus()
 		if err != nil {
+			fmt.Printf("error shortening url: %v", err)
 			return
 		}
 
