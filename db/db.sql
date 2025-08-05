@@ -11,6 +11,7 @@ CREATE TABLE users (
 CREATE TABLE urls (
     id INT AUTO_INCREMENT NOT NULL,
     long_url VARCHAR(255) NOT NULL,
+    short_url VARCHAR(255) NOT NULL,
     userID INT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (userID) REFERENCES users(id)

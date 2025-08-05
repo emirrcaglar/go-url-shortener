@@ -1,8 +1,10 @@
 package urlpkg
 
-func (u *Url) idToShortUrl(baseUrl string) string {
+import "fmt"
+
+func idToShortUrl(baseUrl string, id int) string {
+	fmt.Printf("DEBUG - IDTOSHORTURL id: %d\n", id)
 	chars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	id := u.ID
 
 	if id == 0 {
 		return string(chars[0])
@@ -22,5 +24,6 @@ func (u *Url) idToShortUrl(baseUrl string) string {
 
 	finalResult := baseUrl + string(result)
 
+	fmt.Printf("DEBUG - IDTOSHORTURL finalResult: %s\n", finalResult)
 	return finalResult
 }

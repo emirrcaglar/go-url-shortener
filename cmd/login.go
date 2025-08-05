@@ -8,6 +8,7 @@ import (
 	"github.com/emirrcaglar/go-url-shortener/db"
 	"github.com/emirrcaglar/go-url-shortener/session"
 	"github.com/emirrcaglar/go-url-shortener/types"
+	"github.com/emirrcaglar/go-url-shortener/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -15,6 +16,12 @@ var loginCmd = &cobra.Command{
 	Use:   "login",
 	Short: "Log in to your account",
 	Run: func(cmd *cobra.Command, args []string) {
+		cfg, err := utils.CheckStatus()
+		if err == nil {
+			fmt.Println("Already logged in.")
+			fmt.Println("Run: go-url-shortener logout")
+			return
+		}
 		var username, password string
 
 		fmt.Print("Username: ")
@@ -36,7 +43,7 @@ var loginCmd = &cobra.Command{
 		}
 
 		// Save session
-		cfg := &session.Cfg{
+		cfg = &session.Cfg{
 			LoggedIn: true,
 			CurrentUser: &types.User{
 				ID:       user.ID,
