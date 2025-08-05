@@ -38,7 +38,7 @@ var shortenCmd = &cobra.Command{
 			fmt.Printf("❌ Database error: %v\n", err)
 			return
 		}
-		defer dbConn.Close()
+		defer db.Close(dbConn)
 
 		url_ := &urlpkg.Url{}
 		baseUrl := "short.ly/"

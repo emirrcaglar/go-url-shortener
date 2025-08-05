@@ -28,7 +28,7 @@ var showCmd = &cobra.Command{
 			fmt.Printf("Error connecting to database: %v\n", err)
 			return
 		}
-		defer dbConn.Close()
+		defer db.Close(dbConn)
 
 		rows, err := dbConn.Query("SELECT id, long_url, short_url FROM urls WHERE userID = ?", cfg.CurrentUser.ID)
 		if err != nil {

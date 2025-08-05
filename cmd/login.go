@@ -34,7 +34,7 @@ var loginCmd = &cobra.Command{
 			fmt.Printf("Error connecting to database: %v\n", err)
 			return
 		}
-		defer dbConn.Close()
+		defer db.Close(dbConn)
 
 		user, err := auth.Login(dbConn, username, password)
 		if err != nil {

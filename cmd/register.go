@@ -25,7 +25,7 @@ var registerCmd = &cobra.Command{
 			fmt.Printf("Error connecting to database: %v\n", err)
 			return
 		}
-		defer dbConn.Close()
+		defer db.Close(dbConn)
 
 		err = auth.Register(dbConn, username, password)
 		if err != nil {

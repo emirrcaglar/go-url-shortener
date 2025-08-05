@@ -9,8 +9,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var db *sql.DB
-
 func Connect() (*sql.DB, error) {
 
 	// Load .env file
@@ -22,11 +20,11 @@ func Connect() (*sql.DB, error) {
 	cfg := mysql.NewConfig()
 	cfg.User = os.Getenv("DBUSER")
 	cfg.Passwd = os.Getenv("DBPASS")
-	cfg.Net = "tcp"
-	cfg.Addr = "127.0.0.1:3306"
-	cfg.DBName = "urlshortener"
+	cfg.Net = os.Getenv("DB_HOST")
+	cfg.Addr = os.Getenv("DB_ADDR")
+	cfg.DBName = os.Getenv("DB_NAME")
 
-	db, err = sql.Open("mysql", cfg.FormatDSN())
+	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -35,12 +33,13 @@ func Connect() (*sql.DB, error) {
 	pingErr := db.Ping()
 	if pingErr != nil {
 		log.Println(pingErr)
+		return nil, pingErr
 	}
 
 	log.Println("Successfully connected to db.")
 	return db, nil
 }
 
-func Close() {
+func Close(db *sql.DB) {
 	db.Close()
 }
