@@ -30,7 +30,7 @@ var showCmd = &cobra.Command{
 		}
 		defer dbConn.Close()
 
-		rows, err := dbConn.Query("SELECT id, long_url FROM urls WHERE userID = ?", cfg.CurrentUser.ID)
+		rows, err := dbConn.Query("SELECT id, long_url, short_url FROM urls WHERE userID = ?", cfg.CurrentUser.ID)
 		if err != nil {
 			fmt.Printf("❌ Error querying URLs: %v\n", err)
 			return
@@ -43,14 +43,15 @@ var showCmd = &cobra.Command{
 		for rows.Next() {
 			var id int
 			var longURL string
+			var shortURL string
 
-			err := rows.Scan(&id, &longURL)
+			err := rows.Scan(&id, &longURL, &shortURL)
 			if err != nil {
 				fmt.Printf("❌ Error scanning row: %v\n", err)
 				return
 			}
 
-			fmt.Printf(" - %s → %s\n", longURL)
+			fmt.Printf(" - %s → %s\n", longURL, shortURL)
 			found = true
 		}
 

@@ -12,10 +12,16 @@ type Url struct {
 }
 
 func (*Url) GenerateShortUrl(db *sql.DB, u *Url, long_url string, baseUrl string, userId int) (string, error) {
-	short_url := idToShortUrl(baseUrl, userId)
-	err := saveToDb(db, u, long_url, short_url, userId)
+	err := saveToDb(db, u, long_url, userId)
+	short_url := idToShortUrl(baseUrl, u.ID)
 	if err != nil {
 		log.Printf("Error saving to DB.")
+		return "", err
+	}
+	u.SHORT_URL = short_url
+	err = updateDb(db, u.SHORT_URL, u.LONG_URL, userId)
+	if err != nil {
+		log.Printf("Error updating DB.")
 		return "", err
 	}
 	return short_url, nil

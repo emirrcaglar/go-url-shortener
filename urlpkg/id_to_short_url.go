@@ -2,19 +2,19 @@ package urlpkg
 
 import "fmt"
 
-func idToShortUrl(baseUrl string, id int) string {
-	fmt.Printf("DEBUG - IDTOSHORTURL id: %d\n", id)
+func idToShortUrl(baseUrl string, urlid int) string {
+	fmt.Printf("DEBUG - IDTOSHORTURL id: %d\n", urlid)
 	chars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-	if id == 0 {
+	if urlid == 0 {
 		return string(chars[0])
 	}
 
 	var result []byte
-	for id > 0 {
-		remainder := id % 62
+	for urlid > 0 {
+		remainder := urlid % 62
 		result = append(result, chars[remainder])
-		id = id / 62
+		urlid = urlid / 62
 	}
 
 	// reverse the result
