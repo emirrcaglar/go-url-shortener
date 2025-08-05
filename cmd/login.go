@@ -6,6 +6,8 @@ import (
 
 	"github.com/emirrcaglar/go-url-shortener/auth"
 	"github.com/emirrcaglar/go-url-shortener/db"
+	"github.com/emirrcaglar/go-url-shortener/session"
+	"github.com/emirrcaglar/go-url-shortener/types"
 	"github.com/spf13/cobra"
 )
 
@@ -33,8 +35,19 @@ var loginCmd = &cobra.Command{
 			return
 		}
 
-		currentUser = user
-		loggedIn = true
+		// Save session
+		cfg := &session.Cfg{
+			LoggedIn: true,
+			CurrentUser: &types.User{
+				ID:       user.ID,
+				UserName: user.UserName,
+			},
+		}
+		err = session.SaveConfig(cfg)
+		if err != nil {
+			fmt.Printf("❌ Could not save session: %v\n", err)
+			return
+		}
 		fmt.Printf("✅ Logged in as %s\n", user.UserName)
 	},
 }

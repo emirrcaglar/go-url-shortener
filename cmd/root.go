@@ -5,12 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/emirrcaglar/go-url-shortener/types"
 	"github.com/spf13/cobra"
 )
-
-var loggedIn bool
-var currentUser *types.User // Make sure types.User is accessible
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{

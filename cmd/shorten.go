@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/emirrcaglar/go-url-shortener/db"
+	"github.com/emirrcaglar/go-url-shortener/session"
 	"github.com/emirrcaglar/go-url-shortener/urlpkg"
 	"github.com/spf13/cobra"
 )
@@ -20,16 +21,20 @@ var shortenCmd = &cobra.Command{
 	Short: "Shorten a long URL",
 	Args:  cobra.ExactArgs(1), // Requires exactly one argument
 	Run: func(cmd *cobra.Command, args []string) {
+		cfg, err := session.LoadConfig()
+		if err != nil {
+			fmt.Printf("❌ Error reading session: %v\n", err)
+			return
+		}
+		if !cfg.LoggedIn {
+			fmt.Println("❌ You must be logged in. Run: go-url-shortener login")
+			return
+		}
+
 		longURL := args[0]
 
 		if !isValidURL(longURL) {
 			fmt.Println("❌ Invalid URL. Please enter a valid one.")
-			return
-		}
-
-		if !loggedIn || currentUser == nil {
-			fmt.Println("❌ You must be logged in to shorten URLs.")
-			fmt.Println("Run: go-url-shortener login")
 			return
 		}
 
@@ -42,7 +47,7 @@ var shortenCmd = &cobra.Command{
 
 		url_ := &urlpkg.Url{}
 		baseUrl := "short.ly/"
-		shortURL, err := url_.GenerateShortUrl(dbConn, url_, longURL, baseUrl, currentUser.ID)
+		shortURL, err := url_.GenerateShortUrl(dbConn, url_, longURL, baseUrl, cfg.CurrentUser.ID)
 		if err != nil {
 			fmt.Printf("❌ Error creating short URL: %v\n", err)
 			return
