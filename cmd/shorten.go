@@ -26,13 +26,6 @@ var shortenCmd = &cobra.Command{
 			return
 		}
 
-		longURL := args[0]
-
-		if !isValidURL(longURL) {
-			fmt.Println("❌ Invalid URL. Please enter a valid one.")
-			return
-		}
-
 		dbConn, err := db.Connect()
 		if err != nil {
 			fmt.Printf("❌ Database error: %v\n", err)
@@ -42,6 +35,25 @@ var shortenCmd = &cobra.Command{
 
 		url_ := &urlpkg.Url{}
 		baseUrl := "short.ly/"
+
+		longURL := args[0]
+		custom, _ := cmd.Flags().GetString("custom")
+
+		if custom != "" {
+			err := urlpkg.GenerateCustomUrl(dbConn, url_, longURL, custom, baseUrl, cfg.CurrentUser.ID)
+			if err != nil {
+				fmt.Printf("error generating custom url: %v\n", err)
+				return
+			}
+			fmt.Println("✅ Custom url created.")
+			return
+		}
+
+		if !isValidURL(longURL) {
+			fmt.Println("❌ Invalid URL. Please enter a valid one.")
+			return
+		}
+
 		shortURL, err := url_.GenerateShortUrl(dbConn, url_, longURL, baseUrl, cfg.CurrentUser.ID)
 		if err != nil {
 			fmt.Printf("❌ Error creating short URL: %v\n", err)
@@ -54,4 +66,6 @@ var shortenCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(shortenCmd)
+
+	shortenCmd.Flags().StringP("custom", "c", "", "Custom code")
 }

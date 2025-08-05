@@ -2,6 +2,7 @@ package urlpkg
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 type Url struct {
@@ -69,4 +70,37 @@ func (*Url) checkExistingUrl(db *sql.DB, long_url string, userID int) (string, e
 	}
 
 	return shortCode, nil
+}
+
+func GenerateCustomUrl(db *sql.DB, u *Url, long_url, custom, baseUrl string, userID int) error {
+	// Check if the custom short code already exists
+	exists, err := u.checkExistingCustomUrl(db, custom, userID)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return fmt.Errorf("custom URL '%s' already exists", custom)
+	}
+
+	_, err = db.Exec("INSERT INTO urls (long_url, short_url, userID) VALUES (?, ?, ?)", long_url, custom, userID)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("✅ Generated custom URL: %s%s\n", baseUrl, custom)
+	return nil
+}
+
+// New function to check if custom short URL already exists
+func (*Url) checkExistingCustomUrl(db *sql.DB, short_url string, userID int) (bool, error) {
+	row := db.QueryRow("SELECT short_url FROM urls WHERE short_url = ? AND userID = ?", short_url, userID)
+	var dbShortUrl string
+	err := row.Scan(&dbShortUrl)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
