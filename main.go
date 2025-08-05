@@ -8,7 +8,7 @@ import (
 
 	"github.com/emirrcaglar/go-url-shortener/auth"
 	"github.com/emirrcaglar/go-url-shortener/db"
-	"github.com/emirrcaglar/go-url-shortener/utils"
+	"github.com/emirrcaglar/go-url-shortener/url"
 )
 
 func isValidUrl(inputUrl string) bool {
@@ -107,10 +107,10 @@ func shorten(db *sql.DB, input string) {
 		return
 	}
 
-	url := &utils.Url{}
+	url := &url.Url{}
 	baseUrl := "short.ly/"
 
-	shortUrl := utils.GenerateShortUrl(db, url, input, baseUrl)
+	shortUrl := url.GenerateShortUrl(db, url, input, baseUrl)
 
 	fmt.Printf("Your short url is: %s\n", shortUrl)
 }
